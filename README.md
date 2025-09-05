@@ -1,73 +1,104 @@
-# Welcome to your Lovable project
+VPN MVP
 
-## Project info
+This project is a Minimum Viable Product (MVP) VPN that demonstrates how a Virtual Private Network works at its simplest level.
+It allows a user to connect securely to a remote VPN server, encrypt their internet traffic, and mask their IP address.
 
-**URL**: https://lovable.dev/projects/22b3892a-8983-4c50-a9af-763eb98128b9
+📌 Features
 
-## How can I edit this code?
+Secure encrypted tunnel (using OpenVPN / WireGuard or SSH tunneling).
 
-There are several ways of editing your application.
+Connect/disconnect with one command.
 
-**Use Lovable**
+Basic authentication (username & password or key file).
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/22b3892a-8983-4c50-a9af-763eb98128b9) and start prompting.
+Simple configuration file for server details.
 
-Changes made via Lovable will be committed automatically to this repo.
+⚙️ Requirements
 
-**Use your preferred IDE**
+Server:
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+A Linux VPS (Ubuntu/Debian recommended).
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+Root or sudo access.
 
-Follow these steps:
+Installed VPN software (e.g., OpenVPN or WireGuard).
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+Client:
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+Windows, macOS, Linux, or Android/iOS.
 
-# Step 3: Install the necessary dependencies.
-npm i
+Corresponding VPN client software.
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
-npm run dev
-```
+🛠️ Setup Instructions
+1. Clone the Repo
+git clone https://github.com/yourusername/vpn-mvp.git
+cd vpn-mvp
 
-**Edit a file directly in GitHub**
+2. Server Setup (example with WireGuard)
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+On your server:
 
-**Use GitHub Codespaces**
+sudo apt update && sudo apt install wireguard -y
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
 
-## What technologies are used for this project?
+Generate server keys:
 
-This project is built with:
+wg genkey | tee server_private.key | wg pubkey > server_public.key
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
 
-## How can I deploy this project?
+Create /etc/wireguard/wg0.conf:
 
-Simply open [Lovable](https://lovable.dev/projects/22b3892a-8983-4c50-a9af-763eb98128b9) and click on Share -> Publish.
+[Interface]
+PrivateKey = <server_private.key>
+Address = 10.0.0.1/24
+ListenPort = 51820
 
-## Can I connect a custom domain to my Lovable project?
+[Peer]
+PublicKey = <client_public.key>
+AllowedIPs = 10.0.0.2/32
 
-Yes, you can!
 
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
+Start the VPN:
 
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/tips-tricks/custom-domain#step-by-step-guide)
+sudo wg-quick up wg0
+
+3. Client Setup
+
+Install WireGuard on your computer/phone.
+
+Create a config file (e.g., client.conf):
+
+[Interface]
+PrivateKey = <client_private.key>
+Address = 10.0.0.2/24
+
+[Peer]
+PublicKey = <server_public.key>
+Endpoint = <your-server-ip>:51820
+AllowedIPs = 0.0.0.0/0
+
+
+Bring up the connection:
+
+wg-quick up client
+
+▶️ Usage
+
+Run wg-quick up client to connect.
+
+Run wg-quick down client to disconnect.
+
+Verify with:
+
+curl ifconfig.me
+
+
+It should show your server’s IP.
+
+🚀 Roadmap
+
+Add multiple server locations.
+
+Implement kill switch & split tunneling.
+
+Build a simple desktop/mobile app to toggle VPN.
